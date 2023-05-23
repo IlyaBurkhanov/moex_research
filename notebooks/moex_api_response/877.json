@@ -1,0 +1,1 @@
+{"expirations": {"metadata": {"series_type": {"type": "string", "bytes": 3, "max_size": 0}, "expiration_date": {"type": "date", "bytes": 10, "max_size": 0}}, "columns": ["series_type", "expiration_date"], "data": [["W", "2023-05-24"], ["W", "2023-05-31"], ["M", "2023-06-21"], ["M", "2023-07-19"], ["Q", "2026-03-18"], ["Q", "2026-06-17"]]}}

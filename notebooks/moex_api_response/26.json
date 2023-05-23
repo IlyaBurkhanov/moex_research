@@ -1,0 +1,1 @@
+{"dates": {"metadata": {"from": {"type": "date", "bytes": 30, "max_size": 0}, "till": {"type": "date", "bytes": 30, "max_size": 0}}, "columns": ["from", "till"], "data": [["2013-03-25", "2023-05-17"]]}}

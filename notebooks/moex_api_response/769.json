@@ -1,0 +1,1 @@
+{"netflow2": {"metadata": {"ERROR_MESSAGE": {"type": "string", "bytes": 57, "max_size": 0}}, "columns": ["ERROR_MESSAGE"], "data": [["Invalid date value."]]}}

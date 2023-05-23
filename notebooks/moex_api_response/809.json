@@ -1,0 +1,1 @@
+{"futoi": {"metadata": {"ERROR_MESSAGE": {"type": "string", "bytes": 57, "max_size": 0}}, "columns": ["ERROR_MESSAGE"], "data": [["Invalid date value."]]}, "futoi.dates": {"metadata": {"from": {"type": "date", "bytes": 30, "max_size": 0}, "till": {"type": "date", "bytes": 30, "max_size": 0}}, "columns": ["from", "till"], "data": [[null, null]]}}

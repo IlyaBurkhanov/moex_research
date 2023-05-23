@@ -1,0 +1,1 @@
+{"splits": {"metadata": {"tradedate": {"type": "date", "bytes": 10, "max_size": 0}, "secid": {"type": "string", "bytes": 36, "max_size": 0}, "before": {"type": "int32"}, "after": {"type": "int32"}}, "columns": ["tradedate", "secid", "before", "after"], "data": []}}

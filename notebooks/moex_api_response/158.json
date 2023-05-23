@@ -1,0 +1,1 @@
+{"borders": {"metadata": {"begin": {"type": "datetime", "bytes": 57, "max_size": 0}, "end": {"type": "datetime", "bytes": 57, "max_size": 0}, "interval": {"type": "int32"}, "board_group_id": {"type": "int32"}}, "columns": ["begin", "end", "interval", "board_group_id"], "data": []}}

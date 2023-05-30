@@ -1,4 +1,8 @@
+import pandas as pd
 
+DEFAULT_GET_PARAMS = {
+    "iss.meta": "off"
+}
 
 ENDPOINT_DEFAULTS = {
     873: {"limit": 500},
@@ -7,8 +11,6 @@ ENDPOINT_DEFAULTS = {
 }
 
 PARAMS_ALLOWED_MANY = {"securities", "boardid", "assets", "sectypes"}
-
-
 
 SECTYPE = {
     "1": "Акция обыкновенная",
@@ -38,3 +40,49 @@ OPTION_SERIES_TYPE = {
     "M": "месячный",
     "Q": "квартальный",
 }
+
+DICTIONARY_API_URL = "https://iss.moex.com/iss/index.json"
+INDEX_ID_API_URL = "https://iss.moex.com/iss/statistics/engines/stock/markets/index/analytics.json"
+
+DATATYPES = ["securities", "trades"]
+
+REPORT_NAMES = pd.DataFrame(
+    data=[
+        [
+            "numtrades",
+            "Информация о количестве договоров по инструментам, "
+            "являющимся производными финансовыми инструментами (по валютным парам)",
+        ],
+        [
+            "participants",
+            "Информация о количестве лиц, имеющих открытые позиции по инструментам, "
+            "являющимся производными финансовыми инструментами (по валютным парам)",
+        ],
+        [
+            "openpositions",
+            "Информация об открытых позициях по инструментам, являющимся производными "
+            "финансовыми инструментами (по валютным парам)",
+        ],
+        [
+            "expirationparticipants",
+            "Информация о количестве лиц, имеющих открытые позиции по договорам, "
+            "являющимся производными финансовыми инструментами (по срокам экспирации)",
+        ],
+        [
+            "expirationopenpositions",
+            "Информация об объеме открытых позиций по договорам, являющимся производными "
+            "финансовыми инструментами (по срокам экспирации)",
+        ],
+    ],
+    columns=["report_name", "description"],
+).set_index("report_name")
+
+SESSIONS = pd.DataFrame(
+    data=[
+        [1, "Основная сессия"],
+        [2, "Вечерняя сессия"],
+        [3, "Итого (все сессии)"],
+        [0, "Утренняя сессия"],
+    ],
+    columns=["sessions", "description"],
+).set_index("sessions")

@@ -1,13 +1,16 @@
 import pandas as pd
 
+MAX_REQ_PER_QUERY = 100  # Не больше 100 запросов на одну задачу
+SLEEP_TIME = .2  # Сон между запросами. Чтобы не ддосить апи
+
 DEFAULT_GET_PARAMS = {
     "iss.meta": "off"
 }
 
 ENDPOINT_DEFAULTS = {
-    873: {"limit": 500},
-    791: {"numtrades": 1},
-    147: {"limit": 100},
+    "873": {"limit": 500},
+    "791": {"numtrades": 1},
+    "147": {"limit": 100},
 }
 
 PARAMS_ALLOWED_MANY = {"securities", "boardid", "assets", "sectypes"}

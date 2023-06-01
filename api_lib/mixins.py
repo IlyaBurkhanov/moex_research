@@ -68,7 +68,7 @@ class MoexParamCheckerMixin:
 
     _check_entity = {
         "asset": "_check_asset_ba",
-        "board": "_check_boards",
+        "board": "_check_board_entity",
         "boardgroup": "_check_board_group",
         "collection": "_check_security_collection",
         "datatype": "_check_datatype",
@@ -239,6 +239,11 @@ class MoexParamCheckerMixin:
             if board not in self._set_boards:
                 raise ValueError(f"Площадка '{board}' не найдена.")
         return boards
+
+    def _check_board_entity(self, board: str) -> str:
+        if board not in self._set_boards:
+            raise ValueError(f"Площадка '{board}' не найдена.")
+        return board
 
     def _check_status(self, status: str) -> str:
         lower_status = status.lower()

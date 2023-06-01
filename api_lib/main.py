@@ -46,7 +46,6 @@ class MoexApi(MoexParamCheckerMixin):
     def help() -> None:
         print("Для запроса данных используйте метод request!")
         print("Список базовых сущностей хранится в переменной 'available_entities'")
-        print("Описание сущности возвращается методом 'description'")
         print("Виды бумаг хранятся в переменной 'SECTYPE'")
         print("Срочность опциона хранится в переменной 'OPTION_SERIES_TYPE'")
         print("Все доступные API можно посмотреть вызвав all_api()")
@@ -55,7 +54,7 @@ class MoexApi(MoexParamCheckerMixin):
 
     def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
-            cls._instance = super().__new__(cls, *args, **kwargs)
+            cls.__instance = super().__new__(cls, *args, **kwargs)
         return cls.__instance
 
     def __init__(self):
@@ -78,7 +77,7 @@ class MoexApi(MoexParamCheckerMixin):
             data=index_ids["indices"]["data"], columns=index_ids["indices"]["columns"]
         ).set_index("indexid")
 
-    def description(self, entity: str, name) -> str:
+    def description(self, entity: str, name: str) -> str:
         """
         Получить описание сущности.
         :param entity: тип сущности в единственном числе.
@@ -193,13 +192,23 @@ class MoexApi(MoexParamCheckerMixin):
             for param in list(request_params):
                 if param in api_params:
                     param_value = request_params.pop(param)
-                elif param.startswith("P_"):
-                    param_value = request_params.pop(param)
-                    param = param[2:]
-                    if param not in api_params:
-                        raise KeyError(f"Параметр {param} не используется данным эндпоинтом!")
                 else:
-                    continue
+                    drop_alpha = (
+                        1 if param.startswith("_") else
+                        2 if param.startswith("P_") else
+                        3 if param.find("__") != -1 else
+                        0
+                    )
+                    if drop_alpha:
+                        param_value = request_params.pop(param)
+                        if drop_alpha != 3:
+                            param = param[drop_alpha:]
+                        else:
+                            param = param.replace("__", ".")
+                        if param not in api_params:
+                            raise KeyError(f"Параметр {param} не используется данным эндпоинтом!")
+                    else:
+                        continue
                 if isinstance(param_value, (list, set)) and param not in dictionaries.PARAMS_ALLOWED_MANY:
                     raise ValueError(f"Параметр {param} не может принимать множественные значения!")
                 use_params[param] = self._checker(param, param_value)
@@ -233,6 +242,7 @@ class MoexApi(MoexParamCheckerMixin):
         request = requests.get(url, params=use_params)
         if request.status_code != 200:
             raise requests.RequestException("Запрос вернул статус <> 200 (OK)")
+        # print(request.url)
         return request.json()
 
     @staticmethod
@@ -257,14 +267,14 @@ class MoexApi(MoexParamCheckerMixin):
         cursor_idx = request[cursor]["columns"].index
         index_id, total_id, page_size_id = cursor_idx("INDEX"), cursor_idx("TOTAL"), cursor_idx("PAGESIZE")
         cursor_data = request[cursor]["data"][0]
-        use_params["iss.only"] = cursor_entity
+        use_params["iss.only"] = ','.join([cursor_entity, cursor])
         page_size = cursor_idx("PAGESIZE")
         cnt = 1
         while cnt < dictionaries.MAX_REQ_PER_QUERY and cursor_data[total_id] > cursor_data[index_id] + page_size:
             time.sleep(dictionaries.SLEEP_TIME)
             use_params["start"] += page_size
             request = self._request(url, use_params)
-            tmp_result[cursor_data]["data"].extend(request[cursor_data]["data"])
+            tmp_result[cursor_entity]["data"].extend(request[cursor_entity]["data"])
             cursor_data = request[cursor]["data"][0]
             cnt += 1
         if cnt >= dictionaries.MAX_REQ_PER_QUERY:
@@ -272,6 +282,9 @@ class MoexApi(MoexParamCheckerMixin):
         return self._dataframe_create(tmp_result)
 
     def _request_without_cursor(self, url: str, use_params: dict) -> Union[dict, pd.DataFrame]:
+        # FIXME: Множество поинтов без курсора нужно изучать детально, так как возвращаемые сущности могут быть
+        # без пагинации. Запрос уходит в бесконечный цикл и возвращаются дубликаты.
+        # Костылем является проверка последней записи предыдущего запроса с последней записью текущего
         tmp_result = {}
         use_params.setdefault("start", 0)
         requested_entity = set()
@@ -293,7 +306,7 @@ class MoexApi(MoexParamCheckerMixin):
             time.sleep(dictionaries.SLEEP_TIME)
 
             for entity, value in self._request(url, use_params).items():
-                if len(value["data"]) == 0:
+                if len(value["data"]) == 0 or value["data"][-1] == tmp_result[entity]["data"][-1]:  # FIXME: костыль!
                     requested_entity.remove(entity)
                     is_change_iss_only = True
                 else:
@@ -339,6 +352,9 @@ class MoexApi(MoexParamCheckerMixin):
             2.1. Если имя параметра совпадает с именем глобальной сущности, то к имени параметра добавляем префикс 'P_',
             например, "P_market" для параметра "market";
             2.2. Если значений параметров несколько, передаем их в виде списка, например, securities = ["GAZP", "LKOH"]
+            2.3. Если имя параметра является ключевым атрибутом python, добавьте к имени '_', например: _from.
+            2.4. Если в имени параметра содержится '.' (точка), замените ее на двойное подчеркивание, например:
+            iss.reverse -> iss__reverse
         3. Если хотим указать атрибутный состав полей для блока, то к имени блока добавляем префикс
         'COLUMNS_'. Названия атрибутов перечисляем в списке. Например, COLUMNS_boardgroups = ["slug", "is_default"].
         :return: Если запрашивается только одна сущность то вернется фрейм данных. Если много, то в словаре, где

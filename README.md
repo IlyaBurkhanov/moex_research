@@ -71,11 +71,6 @@ pip install -r requirements.txt
     Описание глобальной сущности можно получить вызвав description
 ```
 Глобальные справочники:
-```
-    MOEX.available_entities
-    MOEX.engines
-    MOEX.description(entity="board", name="TQBR")
-```
 ``` 
     [IN]: MOEX.available_entities
     [OUT]: ['boardgroups', 'boards', 'datatypes', 'durations', 'engines', 'indexids', 'markets', 'report_names'...

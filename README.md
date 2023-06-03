@@ -1,2 +1,2 @@
 # moex_research
-A simple library for moex-api
+Простая библиотека для работы с API MOEX

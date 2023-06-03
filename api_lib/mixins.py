@@ -131,7 +131,7 @@ class MoexParamCheckerMixin:
         if not isinstance(q, str):
             q = str(q)
         for word in q.split():
-            if len(word) < 3:
+            if len(word) < 2:
                 raise ValueError("Запрос инструментов длиной менее трёх букв игнорируются.")
         return q
 
